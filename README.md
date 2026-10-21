@@ -12,7 +12,7 @@
 | **How often** | Once a day, after the US market closes |
 | **How it picks** | Buys the strongest uptrends and sits in cash when the overall market is weak |
 | **How it protects money** | Every buy goes in with a stop-loss. Each trade risks about 1% of the account. It pauses after a bad week and stops completely after a 15% drop. |
-| **How it's tested** | A backtester replays the *same* decision code on years of past prices, with commissions and slippage included. There's also a test suite (`tests/`). |
+| **How it's tested** | A backtester replays the *same* decision code on years of past prices, with commissions and slippage included. 10 automated tests check the safety rules with fake prices and a fake broker, and all pass (`python -m pytest`). |
 | **Safety default** | Paper (practice) trading. Going live needs both a config change *and* a `--live` flag. |
 
 ## How the code is organised
