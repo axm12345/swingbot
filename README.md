@@ -1,9 +1,35 @@
-# SwingBot
+# SwingBot: an automated swing-trading bot with built-in safety limits
 
-A once-a-day swing trading bot for Interactive Brokers. It holds liquid, more volatile
-ETFs for days to weeks, always with a stop-loss sitting at the broker, and it sits in
-cash when the market is weak. It does **not** promise weekly profit, and nothing can.
-Its job is to keep losses small and let trends run.
+**A Python bot that checks the US market once a day and trades a list of ETFs on its own, while keeping each loss small. It runs on a practice account by default and refuses to touch real money unless you explicitly switch it on.**
+
+> This is a personal learning project about automation and risk management, not financial advice. It does not promise profit, and nothing can.
+
+## At a glance
+
+| | |
+|---|---|
+| **What it trades** | 13 liquid US ETFs (Nasdaq 100, semiconductors, energy, gold…), never single stocks |
+| **How often** | Once a day, after the US market closes |
+| **How it picks** | Buys the strongest uptrends and sits in cash when the overall market is weak |
+| **How it protects money** | Every buy goes in with a stop-loss. Each trade risks about 1% of the account. It pauses after a bad week and stops completely after a 15% drop. |
+| **How it's tested** | A backtester replays the *same* decision code on years of past prices, with commissions and slippage included. There's also a test suite (`tests/`). |
+| **Safety default** | Paper (practice) trading. Going live needs both a config change *and* a `--live` flag. |
+
+## How the code is organised
+
+| File | Job |
+|---|---|
+| `strategy.py` | Trend and volatility maths (moving averages, ATR, momentum) |
+| `planner.py` | Decides what to buy, sell and where to move stops. Used by both the live bot and the backtester. |
+| `risk.py` | Position sizing, weekly loss limit, drawdown halt |
+| `news.py` | Blocks new buys on scary headlines (downgrade, lawsuit, probe…) |
+| `data.py` | Daily price data from Yahoo Finance (free) or IBKR |
+| `broker_ib.py` | Talks to Interactive Brokers (orders and stop-losses) |
+| `backtest.py` | Replays the planner on historical data and compares the result with simply holding SPY |
+| `bot.py` | The daily command: `run`, `status`, `report`, `deposit`, `reset-halt` |
+| `config.yaml` | Every setting in one place, so nothing is hard-coded |
+
+---
 
 ## What it does each day
 
@@ -31,7 +57,7 @@ Orders are market-on-open, so they fill when the US market opens.
    python backtest.py --start 2020-01-01 --capital 500
    ```
    Read the table. Compare it honestly against "Hold SPY", especially "Worst drop from peak" and "Weeks with a loss".
-3. **When IBKR approves you,** install **TWS** (or IB Gateway) from IBKR's site and log in to your **paper trading** account.
+3. **Once you have an IBKR account,** install **TWS** (or IB Gateway) from IBKR's site and log in to your **paper trading** account.
 4. **In TWS, enable the API.** Go to *Edit → Global Configuration → API → Settings*:
    - tick **Enable ActiveX and Socket Clients**
    - set the socket port to **7497**
