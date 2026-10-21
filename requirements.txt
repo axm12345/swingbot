@@ -1,0 +1,6 @@
+ib_async>=2.0
+pandas>=2.0
+numpy>=1.24
+pyyaml>=6.0
+yfinance>=0.2.50
+pytest>=8.0

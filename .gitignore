@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+backtest_equity.csv
+state*.json
+*.log
+.env
+.env.*

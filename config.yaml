@@ -1,0 +1,77 @@
+# ============================================================
+#  SwingBot configuration
+#  Change values here, not in the code.
+# ============================================================
+
+# paper = fake money on your IBKR paper account (DEFAULT, keep it here for weeks)
+# live  = real money. Also needs the --live flag on the command line.
+mode: paper
+
+ib:
+  host: 127.0.0.1
+  # TWS:         7497 = paper, 7496 = live
+  # IB Gateway:  4002 = paper, 4001 = live
+  port: 7497
+  client_id: 17
+
+# Where daily price bars come from:
+#   ib    = IBKR (may need a US market data subscription on your account)
+#   yahoo = free Yahoo Finance data via the yfinance package (fine for daily bars)
+data_source: yahoo
+
+# Used to decide if the overall market is healthy enough to buy anything.
+market_symbol: SPY
+
+# What the bot is allowed to trade. Liquid, more volatile ETFs.
+# ETFs don't have single-company earnings surprises, which keeps gap risk lower.
+universe:
+  - QQQ    # Nasdaq 100
+  - SMH    # semiconductors
+  - SOXX   # semiconductors
+  - XLK    # tech
+  - XLY    # consumer discretionary
+  - XLC    # communication services
+  - XLF    # financials
+  - XLI    # industrials
+  - XLE    # energy
+  - XBI    # biotech (very volatile)
+  - IWM    # US small caps
+  - ARKK   # innovation (very volatile)
+  - GLD    # gold (often moves when stocks don't)
+
+strategy:
+  sma_fast: 20          # short trend average (days)
+  sma_slow: 50          # medium trend average (days)
+  sma_regime: 200       # market health average for SPY (days)
+  atr_len: 14           # volatility lookback (days)
+  mom_len: 63           # momentum lookback, about 3 months
+  stop_atr: 2.0         # first stop = entry - 2 x ATR
+  trail_atr: 3.0        # trailing stop = highest close since entry - 3 x ATR
+  max_extension_atr: 2.5  # don't chase: skip if price is > 2.5 ATR above the 20-day average
+  shock_gap_atr: 3.0    # skip a symbol if it gapped more than 3 ATR today (likely news shock)
+
+risk:
+  risk_per_trade: 0.01      # lose at most ~1% of the account if a stop is hit
+  max_positions: 4
+  max_position_pct: 0.30    # no single position bigger than 30% of the account
+  weekly_loss_limit: 0.03   # down 3% this week -> no new buys until next week
+  max_drawdown: 0.15        # down 15% from the peak -> bot stops buying until you reset it
+  fractional_shares: false  # IBKR API fractional orders are limited; keep false unless you've tested it
+
+news:
+  enabled: true
+  lookback_hours: 36
+  # A headline containing any of these blocks NEW buys in that symbol for this run.
+  # It never makes the bot buy or sell anything by itself.
+  risk_words: [downgrade, investigation, lawsuit, fraud, probe, subpoena, halt,
+               bankruptcy, delist, recall, guidance cut, cuts guidance, plunge,
+               offering, short report, default, sanction]
+
+costs:   # used by the backtester to be realistic
+  commission_per_share: 0.005
+  commission_min: 1.0
+  slippage_pct: 0.0005
+
+backtest:
+  start_capital: 1000
+  start: "2015-01-01"
